@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Understanding AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+<style>
+  /* === THEME CONFIGURATION: CSS VARIABLES === */
+  :root {
+    /* Base Palette (New Dark Theme) */
+    --color-primary: #4A5568;      /* Gray 600 - Text Primary */
+    --color-secondary: #A0AEC0;     /* Gray 400 - Text Secondary */
+    --color-accent: #EC4899;        /* Pink 500 */
+    --color-accent-hover: #DB2777;   /* Pink 600 */
+    --color-accent-subtle: rgba(236, 72, 153, 0.1);
+    --color-accent-subtle-hover: rgba(236, 72, 153, 0.2);
+    --color-accent-strong: #F3F4F6;
+    --color-bg: #1A202C;            /* Gray 900 */
+    --color-panel: #2D3748;        /* Gray 800 */
+    --color-border: #4A5568;        /* Gray 600 */
+    --color-subtle: #4A5568;         /* Gray 700 */
+    --color-text-on-accent: #FFFFFF;
+    --color-disabled: #4A5568;      /* Gray 700 */
+    --color-text-disabled: #718096;  /* Gray 500 */
+    --color-error: #F87171;         /* Red 400 */
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+
+    /* Semantic Aliases */
+    --bg-primary: var(--color-bg);
+    --bg-secondary: var(--color-panel);
+    --bg-subtle: var(--color-subtle);
+    --accent-primary: var(--color-accent);
+    --accent-primary-hover: var(--color-accent-hover);
+    --accent-subtle: var(--color-accent-subtle);
+    --accent-subtle-hover: var(--color-accent-subtle-hover);
+    --accent-strong: var(--color-accent-strong);
+    --text-primary: var(--color-primary);
+    --text-secondary: var(--color-secondary);
+    --text-on-accent: var(--color-text-on-accent);
+    --border-color: var(--color-border);
+    --disabled-bg: var(--color-disabled);
+    --disabled-text: var(--color-text-disabled);
+    --error-text: var(--color-error);
+    --error-bg: var(--color-error-bg);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    /* overflow: hidden; */ /* Allow scrolling for mobile */
+  }
+
+  /* === CORE ANIMATIONS === */
+  .fade-in { animation: fadeIn 0.8s ease-in-out forwards; }
+  .fade-in-slow { animation: fadeIn 1.2s ease-in-out forwards; }
+  .slide-up-fade-in { animation: slideUpFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+  .typing-cursor::after {
+    content: '_';
+    color: var(--accent-primary);
+    animation: blink 1.2s step-end infinite;
+    font-weight: normal;
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .dot-pulse { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+  .dot-pulse div { width: 10px; height: 10px; background-color: var(--accent-primary); border-radius: 50%; animation: dot-pulse-anim 1.4s infinite ease-in-out both; }
+  .dot-pulse div:nth-child(1) { animation-delay: -0.32s; }
+  .dot-pulse div:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes dot-pulse-anim { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-panel); }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
+
+  /* === THEME UTILITY CLASSES === */
+  .bg-primary { background-color: var(--bg-primary); }
+  .bg-secondary { background-color: var(--bg-secondary); }
+  .bg-subtle { background-color: var(--bg-subtle); }
+  .bg-accent { background-color: var(--accent-primary); }
+  .hover\\:bg-accent-hover:hover { background-color: var(--accent-primary-hover); }
+  .bg-accent-subtle { background-color: var(--accent-subtle); }
+  .hover\\:bg-accent-subtle-hover:hover { background-color: var(--accent-subtle-hover); }
+  .bg-error { background-color: var(--error-bg); }
+
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-accent { color: var(--accent-primary); }
+  .text-accent-strong { color: var(--accent-strong); }
+  .text-on-accent { color: var(--text-on-accent); }
+  .text-error { color: var(--error-text); }
+
+  .border-theme { border-color: var(--border-color); }
+  .hover\\:border-accent:hover { border-color: var(--accent-primary); }
+  
+  .focus\\:ring-accent:focus {
+    --tw-ring-color: var(--accent-primary);
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  }
+  .focus\\:border-accent:focus { border-color: var(--accent-primary); }
+
+  .disabled\\:bg-disabled:disabled { background-color: var(--disabled-bg); }
+  .disabled\\:text-disabled:disabled { color: var(--disabled-text); }
+  
+  .text-gradient-accent {
+      background-image: linear-gradient(to right, var(--color-accent), #22D3EE);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+  }
+   .text-gradient-accent-light {
+      background-image: linear-gradient(to right, #F9A8D4, #93C5FD);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+  }
+
+</style>
+</head>
+  <body class="text-gray-800">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
